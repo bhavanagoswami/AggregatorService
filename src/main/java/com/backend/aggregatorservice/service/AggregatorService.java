@@ -43,7 +43,9 @@ public class AggregatorService {
 	private static final BlockingQueue<String> queueShipment = new ArrayBlockingQueue(5);
 	private static final BlockingQueue<String> queueTrack = new ArrayBlockingQueue(5);
 	
-	public static LocalTime timeAdded = LocalTime.now();
+	public static LocalTime timeAddedPrice = LocalTime.now();
+	public static LocalTime timeAddedShipment = LocalTime.now();
+	public static LocalTime timeAddedTrack = LocalTime.now();
 
 	@Async
 	public CompletableFuture<AggregatorBean> getAllDetails_AS1(String pricingValues, String trackValues,
@@ -92,7 +94,7 @@ public class AggregatorService {
 			            System.out.println("[Producer] Put : " + pricingList.get(i));
 			            queuePrice.add(pricingList.get(i));
 			            if (queuePrice.size() == 1)
-							timeAdded = LocalTime.now();
+			            	timeAddedPrice = LocalTime.now();
 			            if(queuePrice.size()>=5) {
 			            	break;
 			            	
@@ -102,7 +104,7 @@ public class AggregatorService {
 			            System.out.println("[Producer] Put : " + trackList.get(i));
 			            queueTrack.add(trackList.get(i));
 			            if (queueTrack.size() == 1)
-							timeAdded = LocalTime.now();
+			            	timeAddedTrack = LocalTime.now();
 			            if(queueTrack.size()>=5) {
 			            	break;
 			            }
@@ -111,7 +113,7 @@ public class AggregatorService {
 			            System.out.println("[Producer] Put : " + shipList.get(i));
 			            queueShipment.add(shipList.get(i));
 			            if (queueShipment.size() == 1)
-							timeAdded = LocalTime.now();
+			            	timeAddedShipment = LocalTime.now();
 			            if(queueShipment.size()>=5) {
 			            	break;
 			            }
@@ -140,20 +142,20 @@ public class AggregatorService {
 			 executor.scheduleAtFixedRate(() -> {
 				
 				 if (Duration.between(LocalTime.now(),
-					 timeAdded.plusSeconds(5)).isNegative() && !queuePrice.isEmpty()) {
+					 timeAddedPrice.plusSeconds(5)).isNegative() && !queuePrice.isEmpty()) {
 				 String[] array = queuePrice.toArray(new String[queuePrice.size()]);
 				 priceFuture.add(pricing.getSigleAPIDetails(getQueryParam(array)));
 				 queuePrice.clear(); 
 				 logger.info(" response getting due to Time");
 				 } 
-			    if(Duration.between(LocalTime.now(), timeAdded.plusSeconds(4)).isNegative() &&
+			    if(Duration.between(LocalTime.now(), timeAddedTrack.plusSeconds(5)).isNegative() &&
 						 !queueTrack.isEmpty()) { 
 			    	String[] array = queueTrack.toArray(new String[queueTrack.size()]);
 			    	trackFuture.add(track.getSigleAPIDetails(getQueryParam(array)));
 			    	 logger.info(" response getting due to Time");
 			    	queueTrack.clear();
 			    }
-			    if(Duration.between(LocalTime.now(), timeAdded.plusSeconds(4)).isNegative() &&
+			    if(Duration.between(LocalTime.now(), timeAddedShipment.plusSeconds(5)).isNegative() &&
 						 !queueShipment.isEmpty()) { String[] array = queueShipment.toArray(new
 								 String[queueShipment.size()]);
 						 shipmentFuture.add(shipment.getSigleAPIDetails(getQueryParam(array)));
