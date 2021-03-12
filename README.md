@@ -8,6 +8,8 @@
 	
 	To change port for given API, external application.properties can be used or it would required to be changed in existing  file in my git repo.
 	
+	Generate jar with Maven build.
+	
 	Run the jar file present in code repository with java -jar aggregatorservice.jar command
 
 
